@@ -73,13 +73,29 @@ namespace kikotsoka {
 
         if(current_color() == Color::BLACK){
                 _board[coordinates.column_index()][coordinates.line_index()] = State::BLACK;
+                decrement_pawn_number(Color::BLACK);
         }
 
         if(current_color() == Color::WHITE){
                 _board[coordinates.column_index()][coordinates.line_index()] = State::WHITE;
+                decrement_pawn_number(Color::WHITE);
         }
 
         return true;
+    }
+
+    int Engine::decrement_pawn_number(Color color){
+        if(color == Color::BLACK){
+                _black_pawn_number--;
+                return _black_pawn_number;
+        }
+
+        if(color == Color::WHITE){
+                _white_pawn_number--;
+                return _white_pawn_number;
+        }
+
+        return 0;
     }
 
 }
