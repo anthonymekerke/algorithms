@@ -30,8 +30,6 @@ namespace kikotsoka {
 
         bool move(const Coordinates& coordinates);
 
-        int decrement_pawn_number(Color color);
-
         typedef std::vector<bool> PatternLine;
         typedef std::vector<PatternLine> Pattern;
         typedef std::vector<Pattern> LevelPattern;
@@ -46,6 +44,9 @@ namespace kikotsoka {
         std::vector<std::vector<State::Values> > _board;
         int _black_pawn_number;
         int _white_pawn_number;
+
+        int decrement_pawn_number(Color color);
+        void switch_current_color();
     };
 }
 

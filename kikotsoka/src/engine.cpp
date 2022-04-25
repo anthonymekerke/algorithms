@@ -74,14 +74,18 @@ namespace kikotsoka {
         if(current_color() == Color::BLACK){
                 _board[coordinates.column_index()][coordinates.line_index()] = State::BLACK;
                 decrement_pawn_number(Color::BLACK);
+                switch_current_color();
+                return true;
         }
 
         if(current_color() == Color::WHITE){
                 _board[coordinates.column_index()][coordinates.line_index()] = State::WHITE;
                 decrement_pawn_number(Color::WHITE);
+                switch_current_color();
+                return true;
         }
 
-        return true;
+        return false;
     }
 
     int Engine::decrement_pawn_number(Color color){
@@ -96,6 +100,18 @@ namespace kikotsoka {
         }
 
         return 0;
+    }
+
+    void Engine::switch_current_color(){
+        if(current_color() == Color::BLACK){
+                _current_color = Color::WHITE;
+                return;
+        }
+
+        if(current_color() == Color::WHITE){
+                _current_color = Color::BLACK;
+                return;
+        }
     }
 
 }
