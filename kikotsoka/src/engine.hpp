@@ -25,6 +25,9 @@ namespace kikotsoka {
 
         int current_color() const { return _current_color; }
 
+        int black_pawn_number() const;
+        int white_pawn_number() const;
+
         typedef std::vector<bool> PatternLine;
         typedef std::vector<PatternLine> Pattern;
         typedef std::vector<Pattern> LevelPattern;
@@ -32,10 +35,13 @@ namespace kikotsoka {
 
         static const Patterns PATTERNS;
         static const size_t SIZE;
+        static const size_t PAWN_START;
 
     private:
         Color _current_color;
         std::vector<std::vector<State::Values> > _board;
+        int _black_pawn_number;
+        int _white_pawn_number;
     };
 }
 

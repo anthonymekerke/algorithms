@@ -37,9 +37,11 @@ namespace kikotsoka {
     };
 
     const size_t Engine::SIZE = 12;
+    const size_t Engine::PAWN_START = 60;
 
     Engine::Engine()
-            :_current_color(Color::BLACK), _board(SIZE)
+            :_current_color(Color::BLACK), _board(SIZE), 
+            _black_pawn_number(PAWN_START), _white_pawn_number(PAWN_START)
     {
         for (size_t l = 0; l < SIZE; ++l) {
             _board[l] = std::vector<State::Values>(SIZE);
@@ -54,6 +56,14 @@ namespace kikotsoka {
     State::Values Engine::state(const Coordinates& coordinates) const
     {
         return _board[coordinates.column_index()][coordinates.line_index()];
+    }
+
+    int Engine::black_pawn_number() const{
+        return _black_pawn_number;
+    }
+
+    int Engine::white_pawn_number() const{
+        return _white_pawn_number;
     }
 
 }
