@@ -81,3 +81,13 @@ TEST_CASE("black first move","game")
     REQUIRE(engine.state(h6) != State::VACANT);
     REQUIRE(engine.state(h6) == State::BLACK);
 }
+
+TEST_CASE("black 59 pawn left", "game")
+{
+    Engine engine;
+    Coordinates h6 = Coordinates(7,5);
+
+    engine.move(h6);
+
+    REQUIRE(engine.black_pawn_number() == 59);
+}
