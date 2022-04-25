@@ -59,3 +59,11 @@ TEST_CASE("black starts", "game")
 
     REQUIRE(engine.current_color() == Color::BLACK);
 }
+
+TEST_CASE("start pawn number", "game")
+{
+    const Engine engine;
+
+    REQUIRE(engine.black_pawn_number() == 60);
+    REQUIRE(engine.white_pawn_number() == 60);
+}
