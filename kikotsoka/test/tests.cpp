@@ -67,3 +67,17 @@ TEST_CASE("start pawn number", "game")
     REQUIRE(engine.black_pawn_number() == 60);
     REQUIRE(engine.white_pawn_number() == 60);
 }
+
+TEST_CASE("black first move","game")
+{
+    Engine engine;
+    Coordinates h6 = Coordinates(7,5);
+
+    REQUIRE(h6.column() == 'H');
+    REQUIRE(h6.line() == 6);
+
+    engine.move(h6);
+
+    REQUIRE(engine.state(h6) != State::VACANT);
+    REQUIRE(engine.state(h6) == State::BLACK);
+}
