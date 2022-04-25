@@ -66,4 +66,20 @@ namespace kikotsoka {
         return _white_pawn_number;
     }
 
+    bool Engine::move(const Coordinates& coordinates){
+        if(state(coordinates) != State::VACANT){
+                return false;
+        }
+
+        if(current_color() == Color::BLACK){
+                _board[coordinates.column_index()][coordinates.line_index()] = State::BLACK;
+        }
+
+        if(current_color() == Color::WHITE){
+                _board[coordinates.column_index()][coordinates.line_index()] = State::WHITE;
+        }
+
+        return true;
+    }
+
 }

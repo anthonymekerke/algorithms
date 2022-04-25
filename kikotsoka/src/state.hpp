@@ -13,7 +13,9 @@ namespace kikotsoka {
     class State {
     public:
         enum Values {
-            VACANT = 0
+            VACANT = 0,
+            WHITE = 1,
+            BLACK = 2
         };
 
     };
