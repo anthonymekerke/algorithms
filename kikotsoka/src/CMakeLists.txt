@@ -1,0 +1,13 @@
+INCLUDE_DIRECTORIES(
+  ${CMAKE_SOURCE_DIR}/src)
+
+LINK_DIRECTORIES(
+  ${Boost_LIBRARY_DIRS})
+
+SET(KIKOTSOKA_HPP color.hpp coordinates.hpp engine.hpp state.hpp)
+SET(KIKOTSOKA_CPP coordinates.cpp engine.cpp)
+
+ADD_LIBRARY(kikotsoka SHARED ${KIKOTSOKA_HPP};${KIKOTSOKA_CPP})
+
+INSTALL(FILES ${KIKOTSOKA_HPP} DESTINATION
+  ${KIKOTSOKA_CPP_INCLUDE_DIRS}/kikotsoka/)
