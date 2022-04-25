@@ -91,3 +91,13 @@ TEST_CASE("black 59 pawn left", "game")
 
     REQUIRE(engine.black_pawn_number() == 59);
 }
+
+TEST_CASE("white has to play", "game")
+{
+    Engine engine;
+    Coordinates h6 = Coordinates(7,5);
+
+    engine.move(h6);
+
+    REQUIRE(engine.current_color() == Color::WHITE);
+}
