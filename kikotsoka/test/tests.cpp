@@ -101,3 +101,20 @@ TEST_CASE("white has to play", "game")
 
     REQUIRE(engine.current_color() == Color::WHITE);
 }
+
+TEST_CASE("white first move", "game")
+{
+    Engine engine;
+    Coordinates h6 = Coordinates(7,5);
+    Coordinates i7 = Coordinates(8, 6);
+
+    engine.move(h6);
+    engine.move(i7);
+
+    REQUIRE(i7.column() == 'I');
+    REQUIRE(i7.line() == 7);
+
+    REQUIRE(engine.state(i7) != State::VACANT);
+    REQUIRE(engine.state(i7) == State::WHITE);
+    REQUIRE(engine.white_pawn_number() == 59);
+}
