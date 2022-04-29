@@ -118,3 +118,37 @@ TEST_CASE("white first move", "game")
     REQUIRE(engine.state(i7) == State::WHITE);
     REQUIRE(engine.white_pawn_number() == 59);
 }
+
+TEST_CASE("cells blocked after pattern", "game")
+{
+    Engine engine;
+    Coordinates h6 = Coordinates(7,5);
+    Coordinates i7 = Coordinates(8,6);
+    Coordinates g5 = Coordinates(6,4);
+    Coordinates j8 = Coordinates(9,7);
+    Coordinates f4 = Coordinates(5,3);
+
+    Coordinates f5 = Coordinates(5,4);
+    Coordinates f6 = Coordinates(5,5);
+    Coordinates g4 = Coordinates(6,3);
+    Coordinates g6 = Coordinates(6,5);
+    Coordinates h4 = Coordinates(7,3);
+    Coordinates h5 = Coordinates(7,4);
+
+    engine.move(h6);
+    engine.move(i7);
+    engine.move(g5);
+    engine.move(j8);
+    engine.move(f4);
+    
+    REQUIRE(engine.state(f4) == State::BLACK);
+    REQUIRE(engine.state(g5) == State::BLACK);
+    REQUIRE(engine.state(h6) == State::BLACK);
+
+    REQUIRE(engine.state(f5) == State::BLOCK);
+    REQUIRE(engine.state(f6) == State::BLOCK);
+    REQUIRE(engine.state(g4) == State::BLOCK);
+    REQUIRE(engine.state(g6) == State::BLOCK);
+    REQUIRE(engine.state(h4) == State::BLOCK);
+    REQUIRE(engine.state(h5) == State::BLOCK);
+}
