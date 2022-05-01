@@ -272,3 +272,51 @@ TEST_CASE("Black get 2 points", "game")
 
     REQUIRE(engine.black_score() == 2);
 }
+
+TEST_CASE("White makes first pattern", "game")
+{
+    Engine engine;
+
+    Coordinates h6 = Coordinates(7,5);
+    Coordinates i7 = Coordinates(8,6);
+    Coordinates g5 = Coordinates(6,4);
+    Coordinates j8 = Coordinates(9,7);
+    Coordinates f4 = Coordinates(5,3);
+    Coordinates k9 = Coordinates(10,8);
+
+    Coordinates i8 = Coordinates(8,7);
+    Coordinates i9 = Coordinates(8,8);
+    Coordinates j7 = Coordinates(9,6);
+    Coordinates j9 = Coordinates(9,8);
+    Coordinates k7 = Coordinates(10,6);
+    Coordinates k8 = Coordinates(10,7);
+
+    engine.move(h6);
+    engine.switch_player();
+    engine.move(i7);
+    engine.switch_player();
+    engine.move(g5);
+    engine.switch_player();
+    engine.move(j8);
+    engine.switch_player();
+    engine.move(f4);
+    engine.effect(f4);
+    engine.switch_player();
+    engine.move(k9);
+    engine.effect(k9);
+    
+    REQUIRE(engine.state(i7) == State::WHITE);
+    REQUIRE(engine.state(j8) == State::WHITE);
+    REQUIRE(engine.state(k9) == State::WHITE);
+
+    REQUIRE(engine.state(i8) == State::BLOCK);
+    REQUIRE(engine.state(i9) == State::BLOCK);
+    REQUIRE(engine.state(j7) == State::BLOCK);
+    REQUIRE(engine.state(j9) == State::BLOCK);
+    REQUIRE(engine.state(k7) == State::BLOCK);
+    REQUIRE(engine.state(k8) == State::BLOCK);
+
+    REQUIRE(engine.white_pawn_number() == 57);
+    REQUIRE(engine.white_level() == 1);
+    REQUIRE(engine.white_score() == 0);
+}
