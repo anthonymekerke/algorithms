@@ -164,7 +164,7 @@ TEST_CASE("cells blocked after pattern", "game")
     REQUIRE(engine.state(h5) == State::BLOCK);
 }
 
-TEST_CASE("black goes level 2", "game")
+TEST_CASE("black goes level 1", "game")
 {
     Engine engine;
     Coordinates h6 = Coordinates(7,5);
@@ -187,4 +187,28 @@ TEST_CASE("black goes level 2", "game")
     engine.effect(f4);
     
     REQUIRE(engine.black_level() == 1);
+}
+
+TEST_CASE("black takes 2 pawns from white", "game")
+{
+    Engine engine;
+    Coordinates h6 = Coordinates(7,5);
+    Coordinates h5 = Coordinates(7,4);
+    Coordinates g5 = Coordinates(6,4);
+    Coordinates g4 = Coordinates(6,3);
+    Coordinates f4 = Coordinates(5,3);
+
+    engine.move(h6);
+    engine.switch_player();
+    engine.move(h5);
+    engine.switch_player();
+    engine.move(g5);
+    engine.switch_player();
+    engine.move(g4);
+    engine.switch_player();
+    engine.move(f4);
+    engine.effect(f4);
+
+    REQUIRE(engine.black_pawn_number() == 59);
+    REQUIRE(engine.white_pawn_number() == 58);
 }
