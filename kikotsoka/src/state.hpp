@@ -15,7 +15,8 @@ namespace kikotsoka {
         enum Values {
             VACANT = 0,
             WHITE = 1,
-            BLACK = 2
+            BLACK = 2,
+            BLOCK = 3
         };
 
     };

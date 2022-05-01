@@ -4,6 +4,7 @@
  */
 
 #include "engine.hpp"
+#include <iostream>
 
 namespace kikotsoka {
 
@@ -41,7 +42,8 @@ namespace kikotsoka {
 
     Engine::Engine()
             :_current_color(Color::BLACK), _board(SIZE), 
-            _black_pawn_number(PAWN_START), _white_pawn_number(PAWN_START)
+            _black_pawn_number(PAWN_START), _white_pawn_number(PAWN_START),
+            _black_status(0), _white_status(0)
     {
         for (size_t l = 0; l < SIZE; ++l) {
             _board[l] = std::vector<State::Values>(SIZE);
@@ -102,6 +104,97 @@ namespace kikotsoka {
         Color opponent_color = current_color() == Color::WHITE ? Color::BLACK : Color::WHITE;
 
         _current_color = opponent_color;
+    }
+
+    void Engine::check_possibilities(const Coordinates& coord){
+        int start_column, start_line, end_column, end_line;
+
+        if(coord.column_index() > 1){
+            start_column = -2;
+        }
+        else if(coord.column_index() == 1){
+            start_column = -1;
+        }
+        else if(coord.column_index() == 0){
+            start_column = 0;
+        }
+
+        if(coord.column_index() < SIZE - 3){
+            end_column = 0;
+        }
+        else if(coord.column_index() == SIZE - 2){
+            end_column = -1;
+        }
+        else if(coord.column_index() == SIZE - 1){
+            end_column = -2;
+        }
+
+        if(coord.line_index() > 1){
+            start_line = -2;
+        }
+        else if(coord.line_index() == 1){
+            start_line = -1;
+        }
+        else if(coord.line_index() == 0){
+            start_line = 0;
+        }
+
+        if(coord.line_index() < SIZE - 3){
+            end_line = 0;
+        }
+        else if(coord.line_index() == SIZE - 2){
+            end_line = -1;
+        }
+        else if(coord.line_index() == SIZE - 1){
+            end_line = -2;
+        }
+
+        for(int i = start_line; i <= end_line; i++){
+            for(int j = start_column; j <= end_column; j++){
+                bool checked = check_pattern(Color::BLACK, 0, 1, coord.column_index() + i, 
+                    coord.line_index() + j);
+
+                if(checked){
+                    std::cout<<"pattern verified"<<std::endl;
+                    block_pattern(Color::BLACK, coord.column_index() + i, coord.line_index()+j);
+                }
+            }
+        }
+    }
+
+    bool Engine::check_pattern(Color player, int s, int o, int c_start, int l_start){
+        State::Values state_to_check = player == Color::BLACK ? State::BLACK : State::WHITE;
+        int checked_cells = 0;
+
+        std::cout << "start: "<< "[" << c_start << ";" << l_start << "]" << std::endl;
+
+        for(int l = 0; l < 3; l++){
+            std::cout << "[";
+            for(int c = 0; c < 3; c++){
+                std::cout << "[" << c+c_start << ";" << l+l_start << "]";
+                if((PATTERNS[s][o][l][c] == false && _board[c+c_start][l+l_start] == State::VACANT) ||
+                (PATTERNS[s][o][l][c] == true && _board[c+c_start][l+l_start] == state_to_check))
+                {
+                    checked_cells++;
+                }
+            }
+            std::cout<<"]"<<std::endl;
+        }
+        std::cout<<std::endl;
+
+        return checked_cells == 9;
+    }
+
+    void Engine::block_pattern(Color player, int c_start, int l_start){
+        State::Values state_to_check = player == Color::BLACK ? State::BLACK : State::WHITE;
+
+        for(int l = 0; l < 3; l++){
+            for(int c = 0; c < 3; c++){
+                if(_board[c_start+c][l_start+l] != state_to_check){
+                    _board[c_start+c][l_start+l] = State::BLOCK;
+                }
+            }
+        }
     }
 
 }
