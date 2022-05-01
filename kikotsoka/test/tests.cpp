@@ -163,3 +163,28 @@ TEST_CASE("cells blocked after pattern", "game")
     REQUIRE(engine.state(h4) == State::BLOCK);
     REQUIRE(engine.state(h5) == State::BLOCK);
 }
+
+TEST_CASE("cells blocked after pattern", "game")
+{
+    Engine engine;
+    Coordinates h6 = Coordinates(7,5);
+    Coordinates i7 = Coordinates(8,6);
+    Coordinates g5 = Coordinates(6,4);
+    Coordinates j8 = Coordinates(9,7);
+    Coordinates f4 = Coordinates(5,3);
+
+    REQUIRE(engine.black_level() == 0);
+
+    engine.move(h6);
+    engine.switch_player();
+    engine.move(i7);
+    engine.switch_player();
+    engine.move(g5);
+    engine.switch_player();
+    engine.move(j8);
+    engine.switch_player();
+    engine.move(f4);
+    engine.switch_player();
+    
+    REQUIRE(engine.black_level() == 1);
+}
