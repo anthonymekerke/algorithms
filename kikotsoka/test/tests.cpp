@@ -249,3 +249,26 @@ TEST_CASE("cells blocked after pattern, white pawns taken", "game")
     REQUIRE(engine.state(f5) == State::BLOCK);
     REQUIRE(engine.state(f6) == State::BLOCK);
 }
+
+TEST_CASE("Black get 2 points", "game")
+{
+    Engine engine;
+    Coordinates h6 = Coordinates(7,5);
+    Coordinates h5 = Coordinates(7,4);
+    Coordinates g5 = Coordinates(6,4);
+    Coordinates g4 = Coordinates(6,3);
+    Coordinates f4 = Coordinates(5,3);
+
+    engine.move(h6);
+    engine.switch_player();
+    engine.move(h5);
+    engine.switch_player();
+    engine.move(g5);
+    engine.switch_player();
+    engine.move(g4);
+    engine.switch_player();
+    engine.move(f4);
+    engine.effect(f4);
+
+    REQUIRE(engine.black_score() == 2);
+}
