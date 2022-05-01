@@ -79,7 +79,6 @@ namespace kikotsoka {
         if(current_col == Color::BLACK || current_col == Color::WHITE){
                 _board[coordinates.column_index()][coordinates.line_index()] = current_state;
                 decrement_pawn_number(current_col);
-                switch_current_color();
                 return true;
         }
 
@@ -100,87 +99,60 @@ namespace kikotsoka {
         return 0;
     }
 
-    void Engine::switch_current_color(){
+    void Engine::switch_player(){
         Color opponent_color = current_color() == Color::WHITE ? Color::BLACK : Color::WHITE;
 
         _current_color = opponent_color;
     }
 
-    void Engine::check_possibilities(const Coordinates& coord){
-        int start_column, start_line, end_column, end_line;
+    void Engine::configure_parameters_checking(const Coordinates& coord, int& cs, int& ce, int& ls, int& le){
+        if(coord.column_index() > 1) {cs = -2;}
+        else if(coord.column_index() == 1) {cs = -1;}
+        else if(coord.column_index() == 0) {cs = 0;}
 
-        if(coord.column_index() > 1){
-            start_column = -2;
-        }
-        else if(coord.column_index() == 1){
-            start_column = -1;
-        }
-        else if(coord.column_index() == 0){
-            start_column = 0;
-        }
+        if(coord.column_index() < SIZE - 3) {ce = 0;}
+        else if(coord.column_index() == SIZE - 2) {ce = -1;}
+        else if(coord.column_index() == SIZE - 1) {ce = -2;}
 
-        if(coord.column_index() < SIZE - 3){
-            end_column = 0;
-        }
-        else if(coord.column_index() == SIZE - 2){
-            end_column = -1;
-        }
-        else if(coord.column_index() == SIZE - 1){
-            end_column = -2;
-        }
+        if(coord.line_index() > 1) {ls = -2;}
+        else if(coord.line_index() == 1) {ls = -1;}
+        else if(coord.line_index() == 0) {ls = 0;}
 
-        if(coord.line_index() > 1){
-            start_line = -2;
-        }
-        else if(coord.line_index() == 1){
-            start_line = -1;
-        }
-        else if(coord.line_index() == 0){
-            start_line = 0;
-        }
+        if(coord.line_index() < SIZE - 3) {le = 0;}
+        else if(coord.line_index() == SIZE - 2) {le = -1;}
+        else if(coord.line_index() == SIZE - 1) {le = -2;}
+    }
 
-        if(coord.line_index() < SIZE - 3){
-            end_line = 0;
-        }
-        else if(coord.line_index() == SIZE - 2){
-            end_line = -1;
-        }
-        else if(coord.line_index() == SIZE - 1){
-            end_line = -2;
-        }
+    void Engine::effect(const Coordinates& coord){
+        int c_start, c_end, l_start, l_end;
+        bool pattern_matching;
 
-        for(int i = start_line; i <= end_line; i++){
-            for(int j = start_column; j <= end_column; j++){
-                bool checked = check_pattern(Color::BLACK, 0, 1, coord.column_index() + i, 
-                    coord.line_index() + j);
+        configure_parameters_checking(coord, c_start, c_end, l_start, l_end);
 
-                if(checked){
-                    std::cout<<"pattern verified"<<std::endl;
-                    block_pattern(Color::BLACK, coord.column_index() + i, coord.line_index()+j);
+        for(int c = c_start; c <= c_end; c++){
+            for(int l = l_start; l <= l_end; l++){
+                pattern_matching = match_pattern(Color::BLACK, 0, 1, coord.column_index() + c, coord.line_index() + l);
+
+                if(pattern_matching){
+                    block_pattern(Color::BLACK, coord.column_index() + c, coord.line_index()+l);
                 }
             }
         }
     }
 
-    bool Engine::check_pattern(Color player, int s, int o, int c_start, int l_start){
+    bool Engine::match_pattern(Color player, int s, int o, int c_start, int l_start){
         State::Values state_to_check = player == Color::BLACK ? State::BLACK : State::WHITE;
         int checked_cells = 0;
 
-        std::cout << "start: "<< "[" << c_start << ";" << l_start << "]" << std::endl;
-
         for(int l = 0; l < 3; l++){
-            std::cout << "[";
             for(int c = 0; c < 3; c++){
-                std::cout << "[" << c+c_start << ";" << l+l_start << "]";
                 if((PATTERNS[s][o][l][c] == false && _board[c+c_start][l+l_start] == State::VACANT) ||
                 (PATTERNS[s][o][l][c] == true && _board[c+c_start][l+l_start] == state_to_check))
                 {
                     checked_cells++;
                 }
             }
-            std::cout<<"]"<<std::endl;
         }
-        std::cout<<std::endl;
 
         return checked_cells == 9;
     }

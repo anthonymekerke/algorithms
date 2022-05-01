@@ -29,10 +29,8 @@ namespace kikotsoka {
         int white_pawn_number() const;
 
         bool move(const Coordinates& coordinates);
-
-        void check_possibilities(const Coordinates& coord);
-        bool check_pattern(Color player, int status, int orientation, int l_start, int c_start);
-        void block_pattern(Color player, int l_start, int c_start);
+        void switch_player();
+        void effect(const Coordinates& coord);
 
         typedef std::vector<bool> PatternLine;
         typedef std::vector<PatternLine> Pattern;
@@ -52,7 +50,11 @@ namespace kikotsoka {
         int _white_status;
 
         int decrement_pawn_number(Color color);
-        void switch_current_color();
+
+        void configure_parameters_checking(const Coordinates& coord, int& cs, int& ce, int& ls, int& le);
+
+        bool match_pattern(Color player, int status, int orientation, int l_start, int c_start);
+        void block_pattern(Color player, int l_start, int c_start);
     };
 }
 

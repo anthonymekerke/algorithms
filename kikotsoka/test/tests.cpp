@@ -77,6 +77,7 @@ TEST_CASE("black first move","game")
     REQUIRE(h6.line() == 6);
 
     engine.move(h6);
+    engine.switch_player();
 
     REQUIRE(engine.state(h6) != State::VACANT);
     REQUIRE(engine.state(h6) == State::BLACK);
@@ -88,6 +89,7 @@ TEST_CASE("black 59 pawn left", "game")
     Coordinates h6 = Coordinates(7,5);
 
     engine.move(h6);
+    engine.switch_player();
 
     REQUIRE(engine.black_pawn_number() == 59);
 }
@@ -98,6 +100,7 @@ TEST_CASE("white has to play", "game")
     Coordinates h6 = Coordinates(7,5);
 
     engine.move(h6);
+    engine.switch_player();
 
     REQUIRE(engine.current_color() == Color::WHITE);
 }
@@ -109,7 +112,9 @@ TEST_CASE("white first move", "game")
     Coordinates i7 = Coordinates(8, 6);
 
     engine.move(h6);
+    engine.switch_player();
     engine.move(i7);
+    engine.switch_player();
 
     REQUIRE(i7.column() == 'I');
     REQUIRE(i7.line() == 7);
@@ -136,10 +141,16 @@ TEST_CASE("cells blocked after pattern", "game")
     Coordinates h5 = Coordinates(7,4);
 
     engine.move(h6);
+    engine.switch_player();
     engine.move(i7);
+    engine.switch_player();
     engine.move(g5);
+    engine.switch_player();
     engine.move(j8);
+    engine.switch_player();
     engine.move(f4);
+    engine.effect(f4);
+    engine.switch_player();
     
     REQUIRE(engine.state(f4) == State::BLACK);
     REQUIRE(engine.state(g5) == State::BLACK);
