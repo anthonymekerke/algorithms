@@ -43,7 +43,8 @@ namespace kikotsoka {
     Engine::Engine()
             :_current_color(Color::BLACK), _board(SIZE), 
             _black_pawn_number(PAWN_START), _white_pawn_number(PAWN_START),
-            _black_level(0), _white_level(0)
+            _black_level(0), _white_level(0),
+            _black_score(0), _white_score(0)
     {
         for (size_t l = 0; l < SIZE; ++l) {
             _board[l] = std::vector<State::Values>(SIZE);
@@ -175,6 +176,7 @@ namespace kikotsoka {
             for(int c = 0; c < 3; c++){
                 if(_board[c_start+c][l_start+l] == state_opponent){
                     increment_pawn_number(player);
+                    increment_score(player);
                 }
                 if(_board[c_start+c][l_start+l] != state_player){
                     _board[c_start+c][l_start+l] = State::BLOCK;
@@ -210,6 +212,28 @@ namespace kikotsoka {
         if(color == Color::WHITE){
             _white_pawn_number++;
             return _white_pawn_number;
+        }
+
+        return 0;
+    }
+
+    int Engine::black_score() const{
+        return _black_score;
+    }
+
+    int Engine::white_score() const{
+        return _white_score;
+    }
+
+    int Engine::increment_score(Color color){
+        if(color == Color::BLACK){
+            _black_score++;
+            return _black_score;
+        }
+
+        if(color == Color::WHITE){
+            _white_score++;
+            return _white_score;
         }
 
         return 0;

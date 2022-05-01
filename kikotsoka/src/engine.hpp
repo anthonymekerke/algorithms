@@ -31,6 +31,9 @@ namespace kikotsoka {
         int black_level() const;
         int white_level() const;
 
+        int black_score() const;
+        int white_score() const;
+
         bool move(const Coordinates& coordinates);
         void switch_player();
         void effect(const Coordinates& coord);
@@ -51,10 +54,13 @@ namespace kikotsoka {
         int _white_pawn_number;
         int _black_level;
         int _white_level;
+        int _black_score;
+        int _white_score;
 
         int decrement_pawn_number(Color color);
         int increment_pawn_number(Color color);
         int increment_level(Color color);
+        int increment_score(Color color);
 
         void configure_parameters_checking(const Coordinates& coord, int& cs, int& ce, int& ls, int& le, int& level);
 
