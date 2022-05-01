@@ -43,7 +43,7 @@ namespace kikotsoka {
     Engine::Engine()
             :_current_color(Color::BLACK), _board(SIZE), 
             _black_pawn_number(PAWN_START), _white_pawn_number(PAWN_START),
-            _black_status(0), _white_status(0)
+            _black_level(0), _white_level(0)
     {
         for (size_t l = 0; l < SIZE; ++l) {
             _board[l] = std::vector<State::Values>(SIZE);
@@ -105,7 +105,9 @@ namespace kikotsoka {
         _current_color = opponent_color;
     }
 
-    void Engine::configure_parameters_checking(const Coordinates& coord, int& cs, int& ce, int& ls, int& le){
+    void Engine::configure_parameters_checking(const Coordinates& coord, 
+            int& cs, int& ce, int& ls, int& le, int& level)
+    {
         if(coord.column_index() > 1) {cs = -2;}
         else if(coord.column_index() == 1) {cs = -1;}
         else if(coord.column_index() == 0) {cs = 0;}
@@ -121,20 +123,24 @@ namespace kikotsoka {
         if(coord.line_index() < SIZE - 3) {le = 0;}
         else if(coord.line_index() == SIZE - 2) {le = -1;}
         else if(coord.line_index() == SIZE - 1) {le = -2;}
+
+        if(current_color() == Color::BLACK) {level = black_level();}
+        else if(current_color() == Color::WHITE) {level = white_level();}
     }
 
     void Engine::effect(const Coordinates& coord){
-        int c_start, c_end, l_start, l_end;
+        int c_start, c_end, l_start, l_end, level, orientation = 1;
         bool pattern_matching;
 
-        configure_parameters_checking(coord, c_start, c_end, l_start, l_end);
+        configure_parameters_checking(coord, c_start, c_end, l_start, l_end, level);
 
         for(int c = c_start; c <= c_end; c++){
             for(int l = l_start; l <= l_end; l++){
-                pattern_matching = match_pattern(Color::BLACK, 0, 1, coord.column_index() + c, coord.line_index() + l);
+                pattern_matching = match_pattern(_current_color, level, orientation, coord.column_index() + c, coord.line_index() + l);
 
                 if(pattern_matching){
-                    block_pattern(Color::BLACK, coord.column_index() + c, coord.line_index()+l);
+                    block_pattern(_current_color, coord.column_index() + c, coord.line_index()+l);
+                    increment_level(_current_color);
                 }
             }
         }
@@ -168,5 +174,23 @@ namespace kikotsoka {
             }
         }
     }
+
+    int Engine::increment_level(Color color){
+        if(color == Color::BLACK){
+            _black_level++;
+            return _black_level;
+        }
+
+        if(color == Color::WHITE){
+            _white_level++;
+            return _black_level;
+        }
+
+        return -1;
+    }
+
+    int Engine::black_level() const {return _black_level;}
+
+    int Engine::white_level() const {return _white_level;}
 
 }

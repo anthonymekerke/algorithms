@@ -28,6 +28,9 @@ namespace kikotsoka {
         int black_pawn_number() const;
         int white_pawn_number() const;
 
+        int black_level() const;
+        int white_level() const;
+
         bool move(const Coordinates& coordinates);
         void switch_player();
         void effect(const Coordinates& coord);
@@ -46,12 +49,13 @@ namespace kikotsoka {
         std::vector<std::vector<State::Values> > _board;
         int _black_pawn_number;
         int _white_pawn_number;
-        int _black_status;
-        int _white_status;
+        int _black_level;
+        int _white_level;
 
         int decrement_pawn_number(Color color);
+        int increment_level(Color color);
 
-        void configure_parameters_checking(const Coordinates& coord, int& cs, int& ce, int& ls, int& le);
+        void configure_parameters_checking(const Coordinates& coord, int& cs, int& ce, int& ls, int& le, int& level);
 
         bool match_pattern(Color player, int status, int orientation, int l_start, int c_start);
         void block_pattern(Color player, int l_start, int c_start);

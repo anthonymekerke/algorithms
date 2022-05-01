@@ -164,7 +164,7 @@ TEST_CASE("cells blocked after pattern", "game")
     REQUIRE(engine.state(h5) == State::BLOCK);
 }
 
-TEST_CASE("cells blocked after pattern", "game")
+TEST_CASE("black goes level 2", "game")
 {
     Engine engine;
     Coordinates h6 = Coordinates(7,5);
@@ -184,7 +184,7 @@ TEST_CASE("cells blocked after pattern", "game")
     engine.move(j8);
     engine.switch_player();
     engine.move(f4);
-    engine.switch_player();
+    engine.effect(f4);
     
     REQUIRE(engine.black_level() == 1);
 }
