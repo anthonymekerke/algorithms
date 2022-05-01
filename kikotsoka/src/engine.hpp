@@ -53,6 +53,7 @@ namespace kikotsoka {
         int _white_level;
 
         int decrement_pawn_number(Color color);
+        int increment_pawn_number(Color color);
         int increment_level(Color color);
 
         void configure_parameters_checking(const Coordinates& coord, int& cs, int& ce, int& ls, int& le, int& level);
