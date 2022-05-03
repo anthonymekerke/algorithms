@@ -345,3 +345,33 @@ TEST_CASE("black form second pattern", "game")
     REQUIRE(engine.black_score() == 2);
     REQUIRE(engine.black_pawn_number() == 55);
 }
+
+TEST_CASE("White last move blocks black", "game")
+{
+    Engine engine;
+    Coordinates coords;
+
+    /*
+    Moves: N-H6, B-I7, N-G5, B-J8, N-F4, B-K9, N-A1, B-A3, N-C1, B-C3, N-B2, B-B4  
+    */
+    std::vector<int> columns = {7,8,6,9,5,10,0,0,2,2,1,1};
+    std::vector<int> lines   = {5,6,4,7,3,8,0,2,0,2,1,3};
+
+    for(size_t i = 0; i < columns.size(); ++i){
+        coords = Coordinates(columns[i], lines[i]);
+
+        engine.move(coords);
+        engine.effect(coords);
+        engine.switch_player();
+    }
+
+    Coordinates b3 = Coordinates(1, 2);
+    Coordinates a4 = Coordinates(0, 3);
+    Coordinates c4 = Coordinates(2, 3);
+    Coordinates b5 = Coordinates(1, 4);
+
+    REQUIRE(engine.state(b3) == State::BLOCK_TMP);
+    REQUIRE(engine.state(a4) == State::BLOCK_TMP);
+    REQUIRE(engine.state(c4) == State::BLOCK_TMP);
+    REQUIRE(engine.state(b5) == State::BLOCK_TMP);
+}
