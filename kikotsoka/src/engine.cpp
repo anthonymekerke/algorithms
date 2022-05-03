@@ -4,7 +4,6 @@
  */
 
 #include "engine.hpp"
-#include <iostream>
 
 namespace kikotsoka {
 
@@ -110,38 +109,41 @@ namespace kikotsoka {
             int& cs, int& ce, int& ls, int& le, int& level)
     {
         if(coord.column_index() > 1) {cs = -2;}
-        else if(coord.column_index() == 1) {cs = -1;}
-        else if(coord.column_index() == 0) {cs = 0;}
+        if(coord.column_index() == 1) {cs = -1;}
+        if(coord.column_index() == 0) {cs = 0;}
 
-        if(coord.column_index() < SIZE - 3) {ce = 0;}
-        else if(coord.column_index() == SIZE - 2) {ce = -1;}
-        else if(coord.column_index() == SIZE - 1) {ce = -2;}
-
+        if(coord.column_index() == SIZE - 1) {ce = -2;}
+        if(coord.column_index() == SIZE - 2) {ce = -1;}
+        if(coord.column_index() < SIZE - 2) {ce = 0;}
+        
         if(coord.line_index() > 1) {ls = -2;}
-        else if(coord.line_index() == 1) {ls = -1;}
-        else if(coord.line_index() == 0) {ls = 0;}
+        if(coord.line_index() == 1) {ls = -1;}
+        if(coord.line_index() == 0) {ls = 0;}
 
-        if(coord.line_index() < SIZE - 3) {le = 0;}
-        else if(coord.line_index() == SIZE - 2) {le = -1;}
-        else if(coord.line_index() == SIZE - 1) {le = -2;}
+        if(coord.line_index() == SIZE - 1) {le = -2;}
+        if(coord.line_index() == SIZE - 2) {le = -1;}
+        if(coord.line_index() < SIZE - 2) {le = 0;}
 
         if(current_color() == Color::BLACK) {level = black_level();}
-        else if(current_color() == Color::WHITE) {level = white_level();}
+        if(current_color() == Color::WHITE) {level = white_level();}
     }
 
     void Engine::effect(const Coordinates& coord){
-        int c_start, c_end, l_start, l_end, level, orientation = 1;
+        int c_start, c_end, l_start, l_end, level, orientation;
         bool pattern_matching;
 
         configure_parameters_checking(coord, c_start, c_end, l_start, l_end, level);
+        orientation = PATTERNS[level].size();
 
-        for(int c = c_start; c <= c_end; c++){
-            for(int l = l_start; l <= l_end; l++){
-                pattern_matching = match_pattern(_current_color, level, orientation, coord.column_index() + c, coord.line_index() + l);
+        for(int o = 0; o < orientation; o++){
+            for(int c = c_start; c <= c_end; c++){
+                for(int l = l_start; l <= l_end; l++){
+                    pattern_matching = match_pattern(_current_color, level, o, coord.column_index() + c, coord.line_index() + l);
 
-                if(pattern_matching){
-                    block_pattern(_current_color, coord.column_index() + c, coord.line_index()+l);
-                    increment_level(_current_color);
+                    if(pattern_matching){
+                        block_pattern(_current_color, coord.column_index() + c, coord.line_index()+l);
+                        increment_level(_current_color);
+                    }
                 }
             }
         }
@@ -155,8 +157,7 @@ namespace kikotsoka {
         for(int l = 0; l < 3; l++){
             for(int c = 0; c < 3; c++){
                 if((PATTERNS[s][o][l][c] == false && 
-                        (_board[c+c_start][l+l_start] == State::VACANT || 
-                        _board[c+c_start][l+l_start] == state_opponent)) ||
+                        _board[c+c_start][l+l_start] != state_player) ||
                     (PATTERNS[s][o][l][c] == true && 
                         _board[c+c_start][l+l_start] == state_player))
                 {
