@@ -66,6 +66,9 @@ namespace kikotsoka {
 
         bool match_pattern(Color player, int status, int orientation, int l_start, int c_start);
         void block_pattern(Color player, int l_start, int c_start);
+
+        void block_tmp(const Coordinates& coord);
+        void unblock_tmp();
     };
 }
 

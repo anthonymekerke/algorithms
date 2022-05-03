@@ -60,13 +60,17 @@ namespace kikotsoka {
         return _board[coordinates.column_index()][coordinates.line_index()];
     }
 
-    int Engine::black_pawn_number() const{
-        return _black_pawn_number;
-    }
+    int Engine::black_pawn_number() const {return _black_pawn_number;}
 
-    int Engine::white_pawn_number() const{
-        return _white_pawn_number;
-    }
+    int Engine::white_pawn_number() const {return _white_pawn_number;}
+
+    int Engine::black_level() const {return _black_level;}
+
+    int Engine::white_level() const {return _white_level;}
+
+    int Engine::black_score() const {return _black_score;}
+
+    int Engine::white_score() const {return _white_score;}
 
     bool Engine::move(const Coordinates& coordinates){
         if(state(coordinates) != State::VACANT){
@@ -83,20 +87,6 @@ namespace kikotsoka {
         }
 
         return false;
-    }
-
-    int Engine::decrement_pawn_number(Color color){
-        if(color == Color::BLACK){
-            _black_pawn_number--;
-            return _black_pawn_number;
-        }
-
-        if(color == Color::WHITE){
-            _white_pawn_number--;
-                return _white_pawn_number;
-        }
-
-        return 0;
     }
 
     void Engine::switch_player(){
@@ -147,6 +137,8 @@ namespace kikotsoka {
                 }
             }
         }
+
+        block_tmp(coord);
     }
 
     bool Engine::match_pattern(Color player, int s, int o, int c_start, int l_start){
@@ -186,6 +178,37 @@ namespace kikotsoka {
         }
     }
 
+    void Engine::block_tmp(const Coordinates& coord){
+        int level = _current_color == Color::BLACK ? black_level() : white_level();
+
+        unblock_tmp();
+
+        if(level == 1){
+            if(coord.column_index() != 0 && _board[coord.column_index() - 1][coord.line_index()]==State::VACANT){
+                _board[coord.column_index() - 1][coord.line_index()] = State::BLOCK_TMP;
+            }
+            if(coord.column_index() != SIZE-1 && _board[coord.column_index() + 1][coord.line_index()]==State::VACANT){
+                _board[coord.column_index() + 1][coord.line_index()] = State::BLOCK_TMP;
+            }
+            if(coord.line_index() != 0 && _board[coord.column_index()][coord.line_index()-1]==State::VACANT){
+                _board[coord.column_index()][coord.line_index()-1] = State::BLOCK_TMP;
+            }
+            if(coord.column_index() != SIZE-1 && _board[coord.column_index()][coord.line_index()+1]==State::VACANT){
+                _board[coord.column_index()][coord.line_index()+1] = State::BLOCK_TMP;
+            }
+        }
+    }
+
+    void Engine::unblock_tmp(){
+        for(int c = 0; c < SIZE; ++c){
+            for(int l = 0; l < SIZE; ++l){
+                if(_board[c][l] == State::BLOCK_TMP){
+                    _board[c][l] = State::VACANT;
+                }
+            }
+        }
+    }
+
     int Engine::increment_level(Color color){
         if(color == Color::BLACK){
             _black_level++;
@@ -199,10 +222,6 @@ namespace kikotsoka {
 
         return -1;
     }
-
-    int Engine::black_level() const {return _black_level;}
-
-    int Engine::white_level() const {return _white_level;}
 
     int Engine::increment_pawn_number(Color color){
         if(color == Color::BLACK){
@@ -218,12 +237,18 @@ namespace kikotsoka {
         return 0;
     }
 
-    int Engine::black_score() const{
-        return _black_score;
-    }
+    int Engine::decrement_pawn_number(Color color){
+        if(color == Color::BLACK){
+            _black_pawn_number--;
+            return _black_pawn_number;
+        }
 
-    int Engine::white_score() const{
-        return _white_score;
+        if(color == Color::WHITE){
+            _white_pawn_number--;
+                return _white_pawn_number;
+        }
+
+        return 0;
     }
 
     int Engine::increment_score(Color color){
@@ -239,5 +264,4 @@ namespace kikotsoka {
 
         return 0;
     }
-
 }
