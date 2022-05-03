@@ -16,8 +16,8 @@ namespace kikotsoka {
             VACANT = 0,
             WHITE = 1,
             BLACK = 2,
-            BLOCK = 3,
-            BLOCK_TMP = 4
+            LOCK = 3,
+            BLOCK = 4
         };
 
     };

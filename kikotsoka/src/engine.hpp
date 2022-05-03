@@ -25,18 +25,25 @@ namespace kikotsoka {
 
         int current_color() const { return _current_color; }
 
-        int black_pawn_number() const;
-        int white_pawn_number() const;
+        int black_pawn_number() const {return _black_pawn_number;}
+        int white_pawn_number() const {return _white_pawn_number;}
 
-        int black_level() const;
-        int white_level() const;
+        int black_level() const {return _black_level;}
+        int white_level() const {return _white_level;}
 
-        int black_score() const;
-        int white_score() const;
+        int black_score() const {return _black_score;}
+        int white_score() const {return _white_score;}
 
+        Coordinates& black_last_move() {return _black_last_move;}
+        const Coordinates& black_last_move() const {return _black_last_move;}
+
+        Coordinates& white_last_move() {return _white_last_move;}
+        const Coordinates& white_last_move() const {return _white_last_move;}
+
+        void block_cells();
         bool move(const Coordinates& coordinates);
-        void switch_player();
         void effect(const Coordinates& coord);
+        void switch_player();
 
         typedef std::vector<bool> PatternLine;
         typedef std::vector<PatternLine> Pattern;
@@ -56,19 +63,22 @@ namespace kikotsoka {
         int _white_level;
         int _black_score;
         int _white_score;
+        Coordinates _black_last_move;
+        Coordinates _white_last_move;
 
         int decrement_pawn_number(Color color);
         int increment_pawn_number(Color color);
         int increment_level(Color color);
         int increment_score(Color color);
 
-        void configure_parameters_checking(const Coordinates& coord, int& cs, int& ce, int& ls, int& le, int& level);
+        void configure_parameters_checking(const Coordinates& coord, int& cs, int& ce, int& ls, int& le);
 
         bool match_pattern(Color player, int status, int orientation, int l_start, int c_start);
-        void block_pattern(Color player, int l_start, int c_start);
+        void lock_pattern(Color player, int l_start, int c_start);
 
-        void block_tmp(const Coordinates& coord);
-        void unblock_tmp();
+        void block_neighboring(const Coordinates& coord);
+        void block_potential_patterns(const Coordinates& coord);
+        void unblock_cells();
     };
 }
 

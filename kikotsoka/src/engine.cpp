@@ -4,6 +4,7 @@
  */
 
 #include "engine.hpp"
+#include <iostream>
 
 namespace kikotsoka {
 
@@ -60,18 +61,6 @@ namespace kikotsoka {
         return _board[coordinates.column_index()][coordinates.line_index()];
     }
 
-    int Engine::black_pawn_number() const {return _black_pawn_number;}
-
-    int Engine::white_pawn_number() const {return _white_pawn_number;}
-
-    int Engine::black_level() const {return _black_level;}
-
-    int Engine::white_level() const {return _white_level;}
-
-    int Engine::black_score() const {return _black_score;}
-
-    int Engine::white_score() const {return _white_score;}
-
     bool Engine::move(const Coordinates& coordinates){
         if(state(coordinates) != State::VACANT){
             return false;
@@ -83,6 +72,10 @@ namespace kikotsoka {
         if(current_col == Color::BLACK || current_col == Color::WHITE){
             _board[coordinates.column_index()][coordinates.line_index()] = current_state;
             decrement_pawn_number(current_col);
+
+            if(current_color() == Color::BLACK) {black_last_move() = coordinates;}
+            if(current_color() == Color::WHITE) {white_last_move() = coordinates;}
+
             return true;
         }
 
@@ -96,7 +89,7 @@ namespace kikotsoka {
     }
 
     void Engine::configure_parameters_checking(const Coordinates& coord, 
-            int& cs, int& ce, int& ls, int& le, int& level)
+            int& cs, int& ce, int& ls, int& le)
     {
         if(coord.column_index() > 1) {cs = -2;}
         if(coord.column_index() == 1) {cs = -1;}
@@ -113,16 +106,15 @@ namespace kikotsoka {
         if(coord.line_index() == SIZE - 1) {le = -2;}
         if(coord.line_index() == SIZE - 2) {le = -1;}
         if(coord.line_index() < SIZE - 2) {le = 0;}
-
-        if(current_color() == Color::BLACK) {level = black_level();}
-        if(current_color() == Color::WHITE) {level = white_level();}
     }
 
     void Engine::effect(const Coordinates& coord){
-        int c_start, c_end, l_start, l_end, level, orientation;
+        int level = current_color() == Color::BLACK ? black_level() : white_level();
+        int c_start, c_end, l_start, l_end, orientation;
         bool pattern_matching;
 
-        configure_parameters_checking(coord, c_start, c_end, l_start, l_end, level);
+        configure_parameters_checking(coord, c_start, c_end, l_start, l_end);
+
         orientation = PATTERNS[level].size();
 
         for(int o = 0; o < orientation; o++){
@@ -131,14 +123,12 @@ namespace kikotsoka {
                     pattern_matching = match_pattern(_current_color, level, o, coord.column_index() + c, coord.line_index() + l);
 
                     if(pattern_matching){
-                        block_pattern(_current_color, coord.column_index() + c, coord.line_index()+l);
+                        lock_pattern(_current_color, coord.column_index() + c, coord.line_index()+l);
                         increment_level(_current_color);
                     }
                 }
             }
         }
-
-        block_tmp(coord);
     }
 
     bool Engine::match_pattern(Color player, int s, int o, int c_start, int l_start){
@@ -161,7 +151,7 @@ namespace kikotsoka {
         return checked_cells == 9;
     }
 
-    void Engine::block_pattern(Color player, int c_start, int l_start){
+    void Engine::lock_pattern(Color player, int c_start, int l_start){
         State::Values state_player = player == Color::BLACK ? State::BLACK : State::WHITE;
         State::Values state_opponent = player == Color::BLACK ? State::WHITE : State::BLACK;
 
@@ -172,37 +162,94 @@ namespace kikotsoka {
                     increment_score(player);
                 }
                 if(_board[c_start+c][l_start+l] != state_player){
-                    _board[c_start+c][l_start+l] = State::BLOCK;
+                    _board[c_start+c][l_start+l] = State::LOCK;
                 }
             }
         }
     }
 
-    void Engine::block_tmp(const Coordinates& coord){
-        int level = _current_color == Color::BLACK ? black_level() : white_level();
+    void Engine::block_cells(){
+        Coordinates opponent_last_move = _current_color == Color::BLACK ? white_last_move(): black_last_move();
+        Coordinates player_last_move = _current_color == Color::BLACK ? black_last_move() : white_last_move();
 
-        unblock_tmp();
+        int opponent_level = _current_color == Color::BLACK ? white_level() : black_level();
 
-        if(level == 1){
-            if(coord.column_index() != 0 && _board[coord.column_index() - 1][coord.line_index()]==State::VACANT){
-                _board[coord.column_index() - 1][coord.line_index()] = State::BLOCK_TMP;
-            }
-            if(coord.column_index() != SIZE-1 && _board[coord.column_index() + 1][coord.line_index()]==State::VACANT){
-                _board[coord.column_index() + 1][coord.line_index()] = State::BLOCK_TMP;
-            }
-            if(coord.line_index() != 0 && _board[coord.column_index()][coord.line_index()-1]==State::VACANT){
-                _board[coord.column_index()][coord.line_index()-1] = State::BLOCK_TMP;
-            }
-            if(coord.column_index() != SIZE-1 && _board[coord.column_index()][coord.line_index()+1]==State::VACANT){
-                _board[coord.column_index()][coord.line_index()+1] = State::BLOCK_TMP;
+        std::cout << opponent_last_move.to_string()<<std::endl;
+
+        unblock_cells();
+
+        if(opponent_level == 1){
+            block_neighboring(opponent_last_move);
+        }
+
+        block_potential_patterns(player_last_move);
+
+        for(int i = 0; i < SIZE; ++i){
+            for(int j = 0; j < SIZE; ++j){
+                std::cout<<_board[j][i] << " ";
+            }std::cout<<std::endl;
+        }std::cout<<std::endl;
+    }
+
+    void Engine::block_neighboring(const Coordinates& coord){
+        if(coord.column_index() != 0 && _board[coord.column_index() - 1][coord.line_index()]==State::VACANT){
+            _board[coord.column_index() - 1][coord.line_index()] = State::BLOCK;
+        }
+        if(coord.column_index() != SIZE-1 && _board[coord.column_index() + 1][coord.line_index()]==State::VACANT){
+            _board[coord.column_index() + 1][coord.line_index()] = State::BLOCK;
+        }
+        if(coord.line_index() != 0 && _board[coord.column_index()][coord.line_index()-1]==State::VACANT){
+            _board[coord.column_index()][coord.line_index()-1] = State::BLOCK;
+        }
+        if(coord.column_index() != SIZE-1 && _board[coord.column_index()][coord.line_index()+1]==State::VACANT){
+            _board[coord.column_index()][coord.line_index()+1] = State::BLOCK;
+        }
+    }
+
+    void Engine::block_potential_patterns(const Coordinates& coord){
+        int c_start, c_end, l_start, l_end;
+        Coordinates current_coord;
+        bool pattern_matching;
+
+        int player_level = current_color() == Color::BLACK ? black_level() : white_level();
+
+        configure_parameters_checking(coord, c_start, c_end, l_start, l_end);
+
+        for(int cs = c_start; cs <= c_end; ++cs){
+            for(int ls = l_start; ls <= l_end; ++ls){
+                for(int ccc = 0; ccc < 3; ++ccc){
+                    for(int ccl = 0; ccl < 3; ++ccl){
+
+                        int column = coord.column_index() + cs + ccc;
+                        int line = coord.line_index() + ls + ccl;
+                        if(_board[column][line] == State::VACANT){
+                            _board[column][line] = _current_color == Color::BLACK ? State::BLACK : State::WHITE;
+
+                            for(int l = 0; l < PATTERNS.size(); ++l){
+                                for(int o = 0; o < PATTERNS[l].size(); ++o){
+                                    if(l != player_level){
+                                        pattern_matching = match_pattern(_current_color, l, o, 
+                                            cs + coord.column_index(), ls + coord.line_index());
+
+                                        if(pattern_matching){
+                                            _board[column][line] = State::BLOCK;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if(_board[column][line] != State::BLOCK) {_board[column][line] = State::VACANT;}
+                        }
+                    }
+                }
             }
         }
     }
 
-    void Engine::unblock_tmp(){
+    void Engine::unblock_cells(){
         for(int c = 0; c < SIZE; ++c){
             for(int l = 0; l < SIZE; ++l){
-                if(_board[c][l] == State::BLOCK_TMP){
+                if(_board[c][l] == State::BLOCK){
                     _board[c][l] = State::VACANT;
                 }
             }
