@@ -320,3 +320,28 @@ TEST_CASE("White makes first pattern", "game")
     REQUIRE(engine.white_level() == 1);
     REQUIRE(engine.white_score() == 0);
 }
+
+
+TEST_CASE("black form second pattern", "game")
+{
+    Engine engine;
+    Coordinates coords;
+
+    /*
+    Moves: N-H6, B-I7, N-G5, B-J8, N-F4, B-K9, N-A1, B-A3, N-C1, B-C3, N-B2, B-B5, N-B3  
+    */
+    std::vector<int> columns = {7,8,6,9,5,10,0,0,2,2,1,1,1};
+    std::vector<int> lines   = {5,6,4,7,3,8,0,2,0,2,1,4,2};
+
+    for(size_t i = 0; i < columns.size(); ++i){
+        coords = Coordinates(columns[i], lines[i]);
+
+        engine.move(coords);
+        engine.effect(coords);
+        engine.switch_player();
+    }
+
+    REQUIRE(engine.black_level() == 2);
+    REQUIRE(engine.black_score() == 2);
+    REQUIRE(engine.black_pawn_number() == 55);
+}
