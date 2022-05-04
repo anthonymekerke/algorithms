@@ -409,3 +409,50 @@ TEST_CASE("storie 18", "can't form lower pattern")
 
     REQUIRE(engine.state(coords) == State::BLOCK);
 }
+
+TEST_CASE("storie 19", "white form Ko, black can't play F8")
+{
+    Engine engine;
+    Coordinates coords;
+    /*
+    Moves: N-H6, B-I7, N-G5, B-J8, N-F4, B-K9, N-H7, B-J4, N-G8, B-J5,
+            N-G9, B-I6, N-H8, B-K6.
+    Try: N-F8.
+    */
+    std::vector<int> columns = {7,8,6,9,5,10,7,9,6,9,6,8,7,10};
+    std::vector<int> lines   = {5,6,4,7,3,8,6,3,7,4,8,5,7,5};
+
+    for(size_t i = 0; i < columns.size(); ++i){
+        coords = Coordinates(columns[i], lines[i]);
+
+        engine.block_cells();
+        engine.move(coords);
+        engine.effect(coords);
+        engine.switch_player();
+    }
+
+    engine.block_cells();
+
+    Coordinates i4 = Coordinates(8, 3);
+    Coordinates i5 = Coordinates(8, 4);
+    Coordinates i6 = Coordinates(8, 5);
+    Coordinates j4 = Coordinates(9, 3);
+    Coordinates j5 = Coordinates(9, 4);
+    Coordinates j6 = Coordinates(9, 5);
+    Coordinates k4 = Coordinates(10, 3);
+    Coordinates k5 = Coordinates(10, 4);
+    Coordinates k6 = Coordinates(10, 5);
+    Coordinates f8 = Coordinates(5, 7);
+
+    REQUIRE(engine.state(i4) == State::LOCK);
+    REQUIRE(engine.state(i5) == State::LOCK);
+    REQUIRE(engine.state(i6) == State::WHITE);
+    REQUIRE(engine.state(j4) == State::WHITE);
+    REQUIRE(engine.state(j5) == State::WHITE);
+    REQUIRE(engine.state(j6) == State::LOCK);
+    REQUIRE(engine.state(k4) == State::LOCK);
+    REQUIRE(engine.state(k5) == State::LOCK);
+    REQUIRE(engine.state(k6) == State::WHITE);
+
+    REQUIRE(engine.state(f8) == State::BLOCK);
+}
