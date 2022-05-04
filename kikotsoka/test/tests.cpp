@@ -153,12 +153,12 @@ TEST_CASE("storie 10", "cells blocked after pattern")
     engine.move(j8);
     engine.switch_player();
     engine.move(f4);
-    engine.effect(f4);
+    engine.aftermove();
     engine.switch_player();
     
-    REQUIRE(engine.state(f4) == State::BLACK);
-    REQUIRE(engine.state(g5) == State::BLACK);
-    REQUIRE(engine.state(h6) == State::BLACK);
+    REQUIRE(engine.state(f4) == State::BLACK_LOCK);
+    REQUIRE(engine.state(g5) == State::BLACK_LOCK);
+    REQUIRE(engine.state(h6) == State::BLACK_LOCK);
 
     REQUIRE(engine.state(f5) == State::LOCK);
     REQUIRE(engine.state(f6) == State::LOCK);
@@ -188,7 +188,7 @@ TEST_CASE("storie 11", "black goes level 1")
     engine.move(j8);
     engine.switch_player();
     engine.move(f4);
-    engine.effect(f4);
+    engine.aftermove();
     
     REQUIRE(engine.black_level() == 1);
 }
@@ -211,7 +211,7 @@ TEST_CASE("storie 12", "black takes 2 pawns from white")
     engine.move(g4);
     engine.switch_player();
     engine.move(f4);
-    engine.effect(f4);
+    engine.aftermove();
 
     REQUIRE(engine.black_pawn_number() == 59);
     REQUIRE(engine.white_pawn_number() == 58);
@@ -240,11 +240,11 @@ TEST_CASE("storie 13", "cells blocked after pattern, white pawns taken")
     engine.move(g4);
     engine.switch_player();
     engine.move(f4);
-    engine.effect(f4);
+    engine.aftermove();
 
-    REQUIRE(engine.state(f4) == State::BLACK);
-    REQUIRE(engine.state(g5) == State::BLACK);
-    REQUIRE(engine.state(h6) == State::BLACK);
+    REQUIRE(engine.state(f4) == State::BLACK_LOCK);
+    REQUIRE(engine.state(g5) == State::BLACK_LOCK);
+    REQUIRE(engine.state(h6) == State::BLACK_LOCK);
 
     REQUIRE(engine.state(h5) == State::LOCK);
     REQUIRE(engine.state(g4) == State::LOCK);
@@ -272,7 +272,7 @@ TEST_CASE("storie 14", "Black get 2 points")
     engine.move(g4);
     engine.switch_player();
     engine.move(f4);
-    engine.effect(f4);
+    engine.aftermove();
 
     REQUIRE(engine.black_score() == 2);
 }
@@ -304,14 +304,14 @@ TEST_CASE("storie 15", "White makes first pattern")
     engine.move(j8);
     engine.switch_player();
     engine.move(f4);
-    engine.effect(f4);
+    engine.aftermove();
     engine.switch_player();
     engine.move(k9);
-    engine.effect(k9);
+    engine.aftermove();
     
-    REQUIRE(engine.state(i7) == State::WHITE);
-    REQUIRE(engine.state(j8) == State::WHITE);
-    REQUIRE(engine.state(k9) == State::WHITE);
+    REQUIRE(engine.state(i7) == State::WHITE_LOCK);
+    REQUIRE(engine.state(j8) == State::WHITE_LOCK);
+    REQUIRE(engine.state(k9) == State::WHITE_LOCK);
 
     REQUIRE(engine.state(i8) == State::LOCK);
     REQUIRE(engine.state(i9) == State::LOCK);
@@ -341,7 +341,7 @@ TEST_CASE("storie 16", "black form second pattern")
         coords = Coordinates(columns[i], lines[i]);
 
         engine.move(coords);
-        engine.effect(coords);
+        engine.aftermove();
         engine.switch_player();
     }
 
@@ -364,13 +364,13 @@ TEST_CASE("storie 17", "White last move blocks black")
     for(size_t i = 0; i < columns.size(); ++i){
         coords = Coordinates(columns[i], lines[i]);
 
-        engine.block_cells();
+        engine.block();
         engine.move(coords);
-        engine.effect(coords);
+        engine.aftermove();
         engine.switch_player();
     }
 
-    engine.block_cells();
+    engine.block();
 
     Coordinates b3 = Coordinates(1, 2);
     Coordinates a4 = Coordinates(0, 3);
@@ -397,13 +397,13 @@ TEST_CASE("storie 18", "can't form lower pattern")
     for(size_t i = 0; i < columns.size(); ++i){
         coords = Coordinates(columns[i], lines[i]);
 
-        engine.block_cells();
+        engine.block();
         engine.move(coords);
-        engine.effect(coords);
+        engine.aftermove();
         engine.switch_player();
     }
 
-    engine.block_cells();
+    engine.block();
     
     coords = Coordinates(5,8); //F9
 
@@ -425,13 +425,13 @@ TEST_CASE("storie 19", "white form Ko, black can't play F8")
     for(size_t i = 0; i < columns.size(); ++i){
         coords = Coordinates(columns[i], lines[i]);
 
-        engine.block_cells();
+        engine.block();
         engine.move(coords);
-        engine.effect(coords);
+        engine.aftermove();
         engine.switch_player();
     }
 
-    engine.block_cells();
+    engine.block();
 
     Coordinates i4 = Coordinates(8, 3);
     Coordinates i5 = Coordinates(8, 4);
@@ -446,13 +446,95 @@ TEST_CASE("storie 19", "white form Ko, black can't play F8")
 
     REQUIRE(engine.state(i4) == State::LOCK);
     REQUIRE(engine.state(i5) == State::LOCK);
-    REQUIRE(engine.state(i6) == State::WHITE);
-    REQUIRE(engine.state(j4) == State::WHITE);
-    REQUIRE(engine.state(j5) == State::WHITE);
+    REQUIRE(engine.state(i6) == State::WHITE_LOCK);
+    REQUIRE(engine.state(j4) == State::WHITE_LOCK);
+    REQUIRE(engine.state(j5) == State::WHITE_LOCK);
     REQUIRE(engine.state(j6) == State::LOCK);
     REQUIRE(engine.state(k4) == State::LOCK);
     REQUIRE(engine.state(k5) == State::LOCK);
-    REQUIRE(engine.state(k6) == State::WHITE);
+    REQUIRE(engine.state(k6) == State::WHITE_LOCK);
 
     REQUIRE(engine.state(f8) == State::BLOCK);
+}
+
+TEST_CASE("storie 20", "Black win, score(B-W): 3-1")
+{
+    Engine engine;
+    Coordinates coords;
+
+    /*
+    Moves: B-E12;W-D12;B-G9;W-I2;B-G12;W-E3;B-I9;W-J12;B-J2;
+            W-B11;B-H12;W-A12;B-H2;W-H1;B-D1;W-F12;
+            B-I10;W-G8;B-L10;W-E5;B-E7;W-D10;B-D7;W-K12;B-I6;
+            W-L11;B-F6;W-L5;B-F5;W-H9;B-A11;W-A6;B-I11;W-H6;
+            B-D8;W-B2;B-L7;W-E11;B-B9;W-B1;B-J10;W-B5;B-D6;W-J7;
+            B-G4;W-C2;B-I3;W-K7;B-A2;W-H4;B-C5;W-J11;B-A7;
+            W-I1;B-G10;W-A3;B-B3;W-L1;B-F8;W-I4;B-L4;W-E2;B-L3;
+            W-F4;B-H11;W-A5;B-B7;W-K2;B-K10;W-I8;B-C7;
+            W-L9;B-E4;W-K4;B-H5;W-F2;B-G11;W-G2;B-C6;W-D11;B-A1;
+            W-J6;B-J3;W-E1;B-J5;W-A9;B-F10;W-J1;B-C12;
+            W-L6;B-A8;W-F1;B-K3;W-F11;B-A4;W-G3;B-L8;W-K11;
+            B-L2;W-C11;B-C8;W-I12;B-C4;W-K6
+    */
+    std::vector<int> columns = 
+    { 
+        4,3,6,8,6,4,8,9,9,
+        1,7,0,7,7,3,5,
+        8,6,11,4,4,3,3,10,8,
+        11,5,11,5,7,0,0,8,7,
+        3,1,11,4,1,1,9,1,3,9,
+        6,2,8,10,0,7,2,9,0,
+        8,6,0,1,11,5,8,11,4,11,
+        5,7,0,1,10,10,8,2,
+        11,4,10,7,5,6,6,2,3,0,
+        9,9,4,9,0,5,9,2,
+        11,0,5,10,5,0,6,11,10,
+        11,2,2,8,2,10
+    };
+    std::vector<int> lines   = 
+    {
+        11,11,8,1,11,2,8,11,1,
+        10,11,11,1,0,0,11,
+        9,7,9,4,6,9,6,11,5,
+        10,5,4,4,8,10,5,10,5,
+        7,1,6,10,8,0,9,4,5,6,
+        3,1,2,6,1,3,4,10,6,
+        0,9,2,2,0,7,3,3,1,2,
+        3,10,4,6,1,9,7,6,
+        8,3,3,4,1,10,1,5,10,0,
+        5,2,0,4,8,9,0,11,
+        5,7,0,2,10,3,2,7,10,
+        1,10,7,11,3,5
+    };
+
+    for(size_t i = 0; i < columns.size(); ++i){
+        coords = Coordinates(columns[i], lines[i]);
+
+        engine.block();
+        engine.move(coords);
+        engine.aftermove();
+
+        if(engine.current_color() == Color::BLACK){
+            for(int i = 0; i < 12; ++i){
+                for(int j = 0; j < 12; ++j){
+                    coords = Coordinates(j,i);
+                    std::cout<<engine.state(coords)<<" ";
+                }std::cout<<std::endl;
+            }std::cout<<std::endl;
+        }
+
+        engine.switch_player();
+    }
+
+    /*for(int i = 0; i < 12; ++i){
+        for(int j = 0; j < 12; ++j){
+            coords = Coordinates(j,i);
+            std::cout<<engine.state(coords)<<" ";
+        }std::cout<<std::endl;
+    }std::cout<<std::endl;
+    */
+
+    REQUIRE(engine.black_level() == 2);
+    REQUIRE(engine.black_score() == 3);
+    REQUIRE(engine.white_score() == 1);
 }
