@@ -23,7 +23,7 @@ namespace kikotsoka {
 
         State::Values state(const Coordinates& coordinates) const;
 
-        int current_color() const { return _current_color; }
+        int current_color() const {return _current_color;}
 
         int black_pawn_number() const {return _black_pawn_number;}
         int white_pawn_number() const {return _white_pawn_number;}

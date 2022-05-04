@@ -46,6 +46,9 @@ namespace kikotsoka {
             _black_level(0), _white_level(0),
             _black_score(0), _white_score(0)
     {
+        _black_last_move = Coordinates(-1,-1);
+        _white_last_move = Coordinates(-1,-1);
+
         for (size_t l = 0; l < SIZE; ++l) {
             _board[l] = std::vector<State::Values>(SIZE);
             for (size_t c = 0; c < SIZE; ++c) {
@@ -62,9 +65,7 @@ namespace kikotsoka {
     }
 
     bool Engine::move(const Coordinates& coordinates){
-        if(state(coordinates) != State::VACANT){
-            return false;
-        }
+        if(state(coordinates) != State::VACANT) {return false;}
 
         Color current_col = current_color() == Color::WHITE ? Color::WHITE : Color::BLACK;
         State::Values current_state = current_col == Color::WHITE ? State::WHITE : State::BLACK;
@@ -84,7 +85,6 @@ namespace kikotsoka {
 
     void Engine::switch_player(){
         Color opponent_color = current_color() == Color::WHITE ? Color::BLACK : Color::WHITE;
-
         _current_color = opponent_color;
     }
 
@@ -172,9 +172,9 @@ namespace kikotsoka {
         Coordinates opponent_last_move = _current_color == Color::BLACK ? white_last_move(): black_last_move();
         Coordinates player_last_move = _current_color == Color::BLACK ? black_last_move() : white_last_move();
 
-        int opponent_level = _current_color == Color::BLACK ? white_level() : black_level();
+        if(player_last_move.to_string() == "@0") {return;}
 
-        std::cout << opponent_last_move.to_string()<<std::endl;
+        int opponent_level = _current_color == Color::BLACK ? white_level() : black_level();
 
         unblock_cells();
 
@@ -183,12 +183,6 @@ namespace kikotsoka {
         }
 
         block_potential_patterns(player_last_move);
-
-        for(int i = 0; i < SIZE; ++i){
-            for(int j = 0; j < SIZE; ++j){
-                std::cout<<_board[j][i] << " ";
-            }std::cout<<std::endl;
-        }std::cout<<std::endl;
     }
 
     void Engine::block_neighboring(const Coordinates& coord){
@@ -222,6 +216,7 @@ namespace kikotsoka {
 
                         int column = coord.column_index() + cs + ccc;
                         int line = coord.line_index() + ls + ccl;
+                        
                         if(_board[column][line] == State::VACANT){
                             _board[column][line] = _current_color == Color::BLACK ? State::BLACK : State::WHITE;
 
