@@ -72,7 +72,7 @@ namespace kikotsoka {
 
         if(current_col == Color::BLACK || current_col == Color::WHITE){
             _board[coordinates.column_index()][coordinates.line_index()] = current_state;
-            decrement_pawn_number(current_col);
+            pawn_number_m(current_col);
 
             if(current_color() == Color::BLACK) {black_last_move() = coordinates;}
             if(current_color() == Color::WHITE) {white_last_move() = coordinates;}
@@ -108,38 +108,41 @@ namespace kikotsoka {
         if(coord.line_index() < SIZE - 2) {le = 0;}
     }
 
-    void Engine::effect(const Coordinates& coord){
-        int level = current_color() == Color::BLACK ? black_level() : white_level();
+    void Engine::aftermove(){
+        int lev = current_color() == Color::BLACK ? black_level() : white_level();
+        Coordinates coord = current_color() == Color::BLACK ? black_last_move() : white_last_move();
         int c_start, c_end, l_start, l_end, orientation;
         bool pattern_matching;
 
         configure_parameters_checking(coord, c_start, c_end, l_start, l_end);
 
-        orientation = PATTERNS[level].size();
+        orientation = PATTERNS[lev].size();
 
         for(int o = 0; o < orientation; o++){
             for(int c = c_start; c <= c_end; c++){
                 for(int l = l_start; l <= l_end; l++){
-                    pattern_matching = match_pattern(_current_color, level, o, coord.column_index() + c, coord.line_index() + l);
+                    pattern_matching = match_pattern(lev, o, coord.column_index() + c, coord.line_index() + l);
 
                     if(pattern_matching){
-                        lock_pattern(_current_color, coord.column_index() + c, coord.line_index()+l);
-                        increment_level(_current_color);
+                        lock_pattern(coord.column_index() + c, coord.line_index()+l);
+                        level(_current_color);
                     }
                 }
             }
         }
     }
 
-    bool Engine::match_pattern(Color player, int s, int o, int c_start, int l_start){
-        State::Values state_player = player == Color::BLACK ? State::BLACK : State::WHITE;
-        State::Values state_opponent = player == Color::BLACK ? State::WHITE : State::BLACK;
+    bool Engine::match_pattern(int s, int o, int c_start, int l_start){
+        State::Values state_player = current_color() == Color::BLACK ? State::BLACK : State::WHITE;
+        State::Values state_opponent = current_color() == Color::BLACK ? State::WHITE : State::BLACK;
+
         int checked_cells = 0;
 
         for(int l = 0; l < 3; l++){
             for(int c = 0; c < 3; c++){
                 if((PATTERNS[s][o][l][c] == false && 
-                        _board[c+c_start][l+l_start] != state_player) ||
+                        (_board[c+c_start][l+l_start] == state_opponent ||
+                         _board[c+c_start][l+l_start] == State::VACANT)) ||
                     (PATTERNS[s][o][l][c] == true && 
                         _board[c+c_start][l+l_start] == state_player))
                 {
@@ -151,24 +154,29 @@ namespace kikotsoka {
         return checked_cells == 9;
     }
 
-    void Engine::lock_pattern(Color player, int c_start, int l_start){
-        State::Values state_player = player == Color::BLACK ? State::BLACK : State::WHITE;
-        State::Values state_opponent = player == Color::BLACK ? State::WHITE : State::BLACK;
+    void Engine::lock_pattern(int c_start, int l_start){
+        State::Values state_player = _current_color == Color::BLACK ? State::BLACK : State::WHITE;
+        State::Values state_opponent = _current_color == Color::BLACK ? State::WHITE : State::BLACK;
+        State::Values state_player_lock = _current_color == Color::BLACK ? State::BLACK_LOCK : State::WHITE_LOCK;
 
         for(int l = 0; l < 3; l++){
             for(int c = 0; c < 3; c++){
                 if(_board[c_start+c][l_start+l] == state_opponent){
-                    increment_pawn_number(player);
-                    increment_score(player);
-                }
-                if(_board[c_start+c][l_start+l] != state_player){
+                    pawn_number_p(_current_color);
+                    score(_current_color);
                     _board[c_start+c][l_start+l] = State::LOCK;
+                }
+                if(_board[c_start+c][l_start+l] == State::VACANT){
+                    _board[c_start+c][l_start+l] = State::LOCK;
+                }
+                if(_board[c_start+c][l_start+l] == state_player){
+                    _board[c_start+c][l_start+l] = state_player_lock;
                 }
             }
         }
     }
 
-    void Engine::block_cells(){
+    void Engine::block(){
         Coordinates opponent_last_move = _current_color == Color::BLACK ? white_last_move(): black_last_move();
         Coordinates player_last_move = _current_color == Color::BLACK ? black_last_move() : white_last_move();
 
@@ -176,7 +184,7 @@ namespace kikotsoka {
 
         int opponent_level = _current_color == Color::BLACK ? white_level() : black_level();
 
-        unblock_cells();
+        unblock();
 
         if(opponent_level == 1){
             block_neighboring(opponent_last_move);
@@ -223,7 +231,7 @@ namespace kikotsoka {
                             for(int l = 0; l < PATTERNS.size(); ++l){
                                 for(int o = 0; o < PATTERNS[l].size(); ++o){
                                     if(l != player_level){
-                                        pattern_matching = match_pattern(_current_color, l, o, 
+                                        pattern_matching = match_pattern(l, o, 
                                             cs + coord.column_index(), ls + coord.line_index());
 
                                         if(pattern_matching){
@@ -241,7 +249,7 @@ namespace kikotsoka {
         }
     }
 
-    void Engine::unblock_cells(){
+    void Engine::unblock(){
         for(int c = 0; c < SIZE; ++c){
             for(int l = 0; l < SIZE; ++l){
                 if(_board[c][l] == State::BLOCK){
@@ -251,7 +259,7 @@ namespace kikotsoka {
         }
     }
 
-    int Engine::increment_level(Color color){
+    int Engine::level(Color color){
         if(color == Color::BLACK){
             _black_level++;
             return _black_level;
@@ -265,7 +273,7 @@ namespace kikotsoka {
         return -1;
     }
 
-    int Engine::increment_pawn_number(Color color){
+    int Engine::pawn_number_p(Color color){
         if(color == Color::BLACK){
             _black_pawn_number++;
             return _black_pawn_number;
@@ -279,7 +287,7 @@ namespace kikotsoka {
         return 0;
     }
 
-    int Engine::decrement_pawn_number(Color color){
+    int Engine::pawn_number_m(Color color){
         if(color == Color::BLACK){
             _black_pawn_number--;
             return _black_pawn_number;
@@ -293,7 +301,7 @@ namespace kikotsoka {
         return 0;
     }
 
-    int Engine::increment_score(Color color){
+    int Engine::score(Color color){
         if(color == Color::BLACK){
             _black_score++;
             return _black_score;
@@ -305,5 +313,24 @@ namespace kikotsoka {
         }
 
         return 0;
+    }
+
+    /*
+        Must be called after block() function
+    */
+    std::vector<Coordinates> Engine::get_possible_moves() const{
+        std::vector<Coordinates> possible_moves;
+        Coordinates coords;
+
+        for(int l = 0; l < SIZE; ++l){
+            for(int c = 0; c < SIZE; ++c){
+                if(_board[c][l] == State::VACANT){
+                    coords = Coordinates(c,l);
+                    possible_moves.push_back(coords);
+                }
+            }
+        }
+
+        return possible_moves;
     }
 }

@@ -40,10 +40,12 @@ namespace kikotsoka {
         Coordinates& white_last_move() {return _white_last_move;}
         const Coordinates& white_last_move() const {return _white_last_move;}
 
-        void block_cells();
+        void block();
         bool move(const Coordinates& coordinates);
-        void effect(const Coordinates& coord);
+        void aftermove();
         void switch_player();
+
+        std::vector<Coordinates> get_possible_moves() const;
 
         typedef std::vector<bool> PatternLine;
         typedef std::vector<PatternLine> Pattern;
@@ -66,19 +68,19 @@ namespace kikotsoka {
         Coordinates _black_last_move;
         Coordinates _white_last_move;
 
-        int decrement_pawn_number(Color color);
-        int increment_pawn_number(Color color);
-        int increment_level(Color color);
-        int increment_score(Color color);
+        int pawn_number_m(Color color);
+        int pawn_number_p(Color color);
+        int level(Color color);
+        int score(Color color);
 
         void configure_parameters_checking(const Coordinates& coord, int& cs, int& ce, int& ls, int& le);
 
-        bool match_pattern(Color player, int status, int orientation, int l_start, int c_start);
-        void lock_pattern(Color player, int l_start, int c_start);
+        bool match_pattern(int status, int orientation, int l_start, int c_start);
+        void lock_pattern(int l_start, int c_start);
 
         void block_neighboring(const Coordinates& coord);
         void block_potential_patterns(const Coordinates& coord);
-        void unblock_cells();
+        void unblock();
     };
 }
 
