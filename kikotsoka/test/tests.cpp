@@ -585,29 +585,101 @@ TEST_CASE("storie 21", "White win, score(B-W): 1-4")
     REQUIRE(engine.black_score() == 1);
 }
 
-TEST_CASE("storie 22")
+TEST_CASE("storie 22", "draw, score(B-W): 0-0")
 {
-    /* Moves:
-        BB1 ;WJ11 ;BH5 ;WI11 ;BJ12 ;WD6 ;BD11 ;WH11 ;BG3 ;WC5 ;BE7 ;
-        WG1 ;BH10 ;WL2 ;BC3 ;WD2 ;BF7 ;WK1 ;BL4 ;WI2 ;BB9 ;WE11 ;BC1 ;
-        WD9 ;BE3 ;WC11 ;BL9 ;WB4 ;BC8 ;WJ10 ;BE8 ;WF2 ;BL10 ;WK10 ;BG4 ;
-        WA4 ;BE2 ;WE6 ;BA11 ;WD8 ;BL7 ;WH3 ;BG10 ;WI3 ;BB3 ;WA7 ;BG7 ;
-        WG11 ;BJ5 ;WI10 ;BK2 ;WE10 ;BJ7 ;WC12 ;BI6 ;WD3 ;BF6 ;WG12 ;BB7 ;
-        WF1 ;BA5 ;WJ4 ;BC2 ;WG9 ;BF12 ;WK4 ;BC9 ;WH7 ;BB2 ;WB11 ;BH8 ;WE5 ;
-        BK7 ;WE9 ;BC10 ;WF5 ;BB8 ;WI7 ;BK6 ;WC7 ;BJ1 ;WF11 ;BF4 ;WA8 ;BB10 ;
-        WE4 ;BI1 ;WA12 ;BA6 ;WH1 ;BJ2 ;WA3 ;BD1 ;WA9 ;BF3 ;WI9 ;BD12 ;WA1 ;
-        BK9 ;WJ6 ;BJ9 ;WG8 ;BK12 ;WL1 ;BL5 ;WA2 ;BD7
+    Engine engine;
+    Coordinates coords;
+
+    /* Moves: B-B1;W-J11;B-H5;W-I11;B-J12;W-D6;B-D11;W-H11;B-G3;W-C5;B-E7;
+        W-G1;B-H10;W-L2;B-C3;W-D2;B-F7;W-K1;B-L4;W-I2;B-B9;W-E11;B-C1;
+        W-D9;B-E3;W-C11;B-L9;W-B4;B-C8;W-J10;B-E8;W-F2;B-L10;W-K10;B-G4;
+        W-A4;B-E2;W-E6;B-A11;W-D8;B-L7;W-H3;B-G10;W-I3;B-B3;W-A7;B-G7;
+        W-G11;B-J5;W-I10;B-K2;W-E10;B-J7;W-C12;B-I6;W-D3;B-F6;W-G12;B-B7;
+        W-F1;B-A5;W-J4;B-C2;W-G9;B-F12;W-K4;B-C9;W-H7;B-B2;W-B11;B-H8;W-E5;
+        B-K7;W-E9;B-C10;W-F5;B-B8;W-I7;B-K6;W-C7;B-J1;W-F11;B-F4;W-A8;B-B10;
+        W-E4;B-I1;W-A12;B-A6;W-H1;B-J2;W-A3;B-D1;W-A9;B-F3;W-I9;B-D12;W-A1;
+        B-K9;W-J6;B-J9;W-G8;B-K12;W-L1;B-L5;W-A2;B-D7
     */
+
+    std::vector<int> columns = 
+    {
+        1,9,7,8,9,3,3,7,6,2,4,
+        6,7,11,2,3,5,10,11,8,1,4,2,
+        3,4,2,11,1,2,9,4,5,11,10,6,
+        0,4,4,0,3,11,7,6,8,1,0,6,
+        6,9,8,10,4,9,2,8,3,5,6,1,
+        5,0,9,2,6,5,10,2,7,1,1,7,4,
+        10,4,2,5,1,8,10,2,9,5,5,0,1,
+        4,8,0,0,7,9,0,3,0,5,8,3,0,
+        10,9,9,6,10,11,11,0,3
+    };
+
+    std::vector<int> lines = 
+    {
+        0,10,4,10,11,5,10,10,2,4,6,
+        0,9,1,2,1,6,0,3,1,8,10,0,
+        8,2,10,8,3,7,9,7,1,9,9,3,
+        3,1,5,10,7,6,2,9,2,2,6,6,
+        10,4,9,1,9,6,11,5,2,5,11,6,
+        0,4,3,1,8,11,3,8,6,1,10,7,4,
+        6,8,9,4,7,6,5,6,0,10,3,7,9,
+        3,0,11,5,0,1,2,0,8,2,8,11,0,
+        8,5,8,7,11,0,4,1,6
+    };
+
+    for(size_t i = 0; i < columns.size(); ++i){
+        coords = Coordinates(columns[i], lines[i]);
+
+        engine.block();
+        engine.move(coords);
+        engine.aftermove();
+
+        engine.switch_player();
+    }
+
+    REQUIRE(engine.white_level() == 1);
+    REQUIRE(engine.black_level() == 1);
+    REQUIRE(engine.white_score() == 0);
+    REQUIRE(engine.black_score() == 0);
 }
 
 TEST_CASE("storie 23")
 {
-    /* Moves:
-        BA8 ;WC2 ;BC10 ;WG8 ;BB9 ;WK9 ;BD8 ;WF9 ;BE10 ;WB6 ;BF8 ;WG6 ;
-        BE9 ;WJ4 ;BE4 ;WK3 ;BD5 ;WG10 ;BE3 ;WC1 ;BF4 ;WH4 ;BD4 ;WI3 ;BJ8 ;
-        WC7 ;BJ7 ;WG3 ;BI7 ;WL4 ;BH8 ;WD2 ;BH7 ;WJ9 ;BI9 ;WD6 ;BH9 ;WK7 ;
-        BJ12 ;WG7 ;BK11 ;WF1 ;BK12 ;WH6 ;BI10 ;WL7 ;BK10 ;WC5 ;BJ10 ;WE12 ;BI12
+    Engine engine;
+    Coordinates coords;
+
+    /* Moves: B-A8;W-C2;B-C10;W-G8;B-B9;W-K9;B-D8;W-F9;B-E10;W-B6;B-F8;W-G6;
+        B-E9;W-J4;B-E4;W-K3;B-D5;W-G10;B-E3;W-C1;B-F4;W-H4;B-D4;W-I3;B-J8;
+        W-C7;B-J7;W-G3;B-I7;W-L4;B-H8;W-D2;B-J1;W-J9;B-I9;W-D6;B-H9;W-K7;
+        B-J12;W-G7;B-K11;W-F1;B-K12;W-H6;B-I10;W-L7;B-K10;W-C5;B-J10;W-E12;B-I12
     */
+
+    std::vector<int> columns = 
+    {
+        0,2,2,6,1,10,3,5,4,1,5,6,
+        4,9,4,10,3,6,4,2,5,7,3,8,9,
+        2,9,6,8,11,7,3,9,9,8,3,7,10,
+        9,6,10,5,10,7,8,11,10,2,9,4,8
+    };
+    std::vector<int> lines = 
+    {
+        7,1,9,7,8,8,7,8,9,5,7,5,
+        8,3,3,2,4,9,2,0,3,3,3,2,7,
+        6,6,2,6,3,7,1,0,8,8,5,8,6,
+        11,6,10,0,11,5,9,6,9,4,9,11,11
+    };
+
+    for(size_t i = 0; i < columns.size(); ++i){
+        coords = Coordinates(columns[i], lines[i]);
+
+        engine.block();
+        engine.move(coords);
+        engine.aftermove();
+
+        engine.switch_player();
+    }
+
+    REQUIRE(engine.black_level() == 5);
 }
 
     /*
