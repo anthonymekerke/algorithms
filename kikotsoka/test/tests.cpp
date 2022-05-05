@@ -514,6 +514,110 @@ TEST_CASE("storie 20", "Black win, score(B-W): 3-1")
         engine.move(coords);
         engine.aftermove();
 
+        engine.switch_player();
+    }
+
+    REQUIRE(engine.black_level() == 2);
+    REQUIRE(engine.black_score() == 3);
+    REQUIRE(engine.white_score() == 1);
+}
+
+TEST_CASE("storie 21", "White win, score(B-W): 1-4")
+{
+    Engine engine;
+    Coordinates coords;
+
+    /* Moves: B-C6;W-I6;B-A6;W-G4;B-B10;W-J10;B-H12;W-A7;B-K10;W-C10;B-J5;
+        W-I5;B-L5;W-A1;B-H4;W-D5;B-J3;W-D12;B-D8;W-J6;B-D10;W-C2;B-F8;
+        W-A4;B-E4;W-I8;B-B2;W-G3;B-C9;W-B12;B-B4;W-E3;B-I12;W-E6;B-K12;
+        W-L9;B-J1;W-L11;B-J12;W-J8;B-C1;W-E12;B-G1;W-E11;B-H5;W-B1;
+        B-H10;W-D3;B-G9;W-L1;B-H7;W-F6;B-B8;W-I9;B-F3;W-L3;B-C11;W-G7;B-E2;
+        W-K2;B-B7;W-G2;B-A12;W-L4;B-K1;W-F5;B-K4;W-I2;B-E1;W-A10;B-K6;W-H3;
+        B-E9;W-C12;B-D6;W-L7;B-J7;W-I11;B-H1;W-K11;B-K5;W-I1;B-G12;W-E8;
+        B-C5;W-E7;B-K3;W-D11;B-L2;W-K7;B-D4;W-A3;B-H11;W-A5;B-F7;W-K9;B-J11;
+        W-A11;B-F11;W-D7;B-J2;W-L10;B-H2;W-E10;B-G5;W-D9;B-@;W-A2;B-@;W-J4;B-@;W-C4
+    */
+
+    std::vector<int> columns = 
+    {
+        2,8,0,6,1,9,7,0,10,2,9,
+        8,11,0,7,3,9,3,3,9,3,2,5,
+        0,1,8,1,6,2,1,1,4,8,4,10,
+        11,9,11,9,9,2,4,6,4,7,1,
+        7,3,6,11,7,5,1,8,5,11,2,6,4,
+        10,1,6,0,11,10,5,10,8,4,0,10,7,
+        4,2,3,11,9,8,7,10,10,8,6,4,
+        2,4,10,3,11,10,3,0,7,0,4,10,9,
+        0,5,3,9,11,7,4,6,3,-1,0,-1,9,-1,2
+    };
+    std::vector<int> lines   = 
+    {
+        5,5,5,3,9,9,11,6,9,9,4,
+        4,4,0,3,4,2,11,7,5,9,1,7,
+        3,3,7,1,2,8,11,3,2,11,5,11,
+        8,0,10,11,7,0,11,0,10,4,0,
+        9,2,8,0,6,5,7,8,2,2,10,6,1,
+        1,6,1,11,3,0,4,3,1,0,9,5,2,
+        8,11,5,6,6,10,0,10,4,0,11,7,
+        4,6,2,10,1,6,3,2,10,4,6,8,10,
+        10,10,6,1,9,1,9,4,8,-1,1,-1,3,-1,3
+    };
+
+    std::vector<Coordinates> possible_moves;
+
+    for(size_t i = 0; i < columns.size(); ++i){
+        coords = Coordinates(columns[i], lines[i]);
+
+        engine.block();
+
+        possible_moves = engine.get_possible_moves();
+
+        if(!possible_moves.empty()){
+            engine.move(coords);
+            engine.aftermove();
+        }        
+
+        engine.switch_player();
+    }
+
+    REQUIRE(engine.white_level() == 2);
+    REQUIRE(engine.white_score() == 4);
+    REQUIRE(engine.black_score() == 1);
+}
+
+TEST_CASE("storie 22")
+{
+    /* Moves:
+        BB1 ;WJ11 ;BH5 ;WI11 ;BJ12 ;WD6 ;BD11 ;WH11 ;BG3 ;WC5 ;BE7 ;
+        WG1 ;BH10 ;WL2 ;BC3 ;WD2 ;BF7 ;WK1 ;BL4 ;WI2 ;BB9 ;WE11 ;BC1 ;
+        WD9 ;BE3 ;WC11 ;BL9 ;WB4 ;BC8 ;WJ10 ;BE8 ;WF2 ;BL10 ;WK10 ;BG4 ;
+        WA4 ;BE2 ;WE6 ;BA11 ;WD8 ;BL7 ;WH3 ;BG10 ;WI3 ;BB3 ;WA7 ;BG7 ;
+        WG11 ;BJ5 ;WI10 ;BK2 ;WE10 ;BJ7 ;WC12 ;BI6 ;WD3 ;BF6 ;WG12 ;BB7 ;
+        WF1 ;BA5 ;WJ4 ;BC2 ;WG9 ;BF12 ;WK4 ;BC9 ;WH7 ;BB2 ;WB11 ;BH8 ;WE5 ;
+        BK7 ;WE9 ;BC10 ;WF5 ;BB8 ;WI7 ;BK6 ;WC7 ;BJ1 ;WF11 ;BF4 ;WA8 ;BB10 ;
+        WE4 ;BI1 ;WA12 ;BA6 ;WH1 ;BJ2 ;WA3 ;BD1 ;WA9 ;BF3 ;WI9 ;BD12 ;WA1 ;
+        BK9 ;WJ6 ;BJ9 ;WG8 ;BK12 ;WL1 ;BL5 ;WA2 ;BD7
+    */
+}
+
+TEST_CASE("storie 23")
+{
+    /* Moves:
+        BA8 ;WC2 ;BC10 ;WG8 ;BB9 ;WK9 ;BD8 ;WF9 ;BE10 ;WB6 ;BF8 ;WG6 ;
+        BE9 ;WJ4 ;BE4 ;WK3 ;BD5 ;WG10 ;BE3 ;WC1 ;BF4 ;WH4 ;BD4 ;WI3 ;BJ8 ;
+        WC7 ;BJ7 ;WG3 ;BI7 ;WL4 ;BH8 ;WD2 ;BH7 ;WJ9 ;BI9 ;WD6 ;BH9 ;WK7 ;
+        BJ12 ;WG7 ;BK11 ;WF1 ;BK12 ;WH6 ;BI10 ;WL7 ;BK10 ;WC5 ;BJ10 ;WE12 ;BI12
+    */
+}
+
+    /*
+    for(int i = 0; i < 12; ++i){
+        for(int j = 0; j < 12; ++j){
+            coords = Coordinates(j,i);
+            std::cout<<engine.state(coords)<<" ";
+        }std::cout<<std::endl;
+    }std::cout<<std::endl;
+
         if(engine.current_color() == Color::BLACK){
             for(int i = 0; i < 12; ++i){
                 for(int j = 0; j < 12; ++j){
@@ -522,19 +626,4 @@ TEST_CASE("storie 20", "Black win, score(B-W): 3-1")
                 }std::cout<<std::endl;
             }std::cout<<std::endl;
         }
-
-        engine.switch_player();
-    }
-
-    /*for(int i = 0; i < 12; ++i){
-        for(int j = 0; j < 12; ++j){
-            coords = Coordinates(j,i);
-            std::cout<<engine.state(coords)<<" ";
-        }std::cout<<std::endl;
-    }std::cout<<std::endl;
     */
-
-    REQUIRE(engine.black_level() == 2);
-    REQUIRE(engine.black_score() == 3);
-    REQUIRE(engine.white_score() == 1);
-}
