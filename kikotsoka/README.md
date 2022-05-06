@@ -60,9 +60,9 @@ Le projet a été développé dans une démarche de développement dirigé par l
 
 ### Images
 
-![image] (img/board.png "Plateau du jeu.")
+![image](img/board.png "Plateau du jeu.")
 
-![image2] (img/patterns.png "Patterns à former.")
+![image2](img/patterns.png "Patterns à former.")
 
 ### Fonctionnalitées
 
