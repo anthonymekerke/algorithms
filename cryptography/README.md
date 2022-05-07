@@ -26,7 +26,7 @@ Pour chaque lettre en clair, on sélectionne la colonne correspondante et pour u
 ### Simplified-Data Encryption Standard (SDES)
 
 Version simplifié de l'algorithme [DES](https://fr.wikipedia.org/wiki/Data_Encryption_Standard) développer en 1977 et devenue obsolète depuis.  
-C'est un algorithme de chiffrement symétrique, c'est-à-dire qu'on utilise deux clés de chiffement.  
+C'est un algorithme de chiffrement symétrique, c'est-à-dire qu'on utilise deux clés de chiffrement.  
 Pour chaque caractère codé sur 8 bits (représentation ASCII), on effectue 5 étapes:
 
 - Une permutation initiale des bits (**IP**)
@@ -40,6 +40,10 @@ Pour chaque caractère codé sur 8 bits (représentation ASCII), on effectue 5 �
 - Une permutation inverse de la permutation initiale **IP-¹**
 
 [Plus d\'infos](https://www.geeksforgeeks.org/simplified-data-encryption-standard-key-generation/)
+
+### Chiffrement RSA
+
+Le chiffrement [RSA](https://fr.wikipedia.org/wiki/Chiffrement_RSA) est aujourd'hui encore pour le chiffrement des données dans le e-commerce.  C'est un algorithme de chiffrement asymétrique, c'est-à-dire que deux clés sont utilisées: une clé privé et une clé publique.  
 
 #### Help
 
